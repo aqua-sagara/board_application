@@ -3,7 +3,7 @@ session_start();
 include_once 'dbconnect.php';
 // ログイン状態チェック
 if (!isset($_SESSION["user"])) {
-    header("Location: logout.php");
+    header("Location: Logout.php");
     exit;
 }
 $errorMessage="";
@@ -49,7 +49,7 @@ catch (PDOException $e) {
     ようこそ<u><?php echo htmlspecialchars($_SESSION["user"], ENT_QUOTES);
     ?></u>さん
      <!-- ユーザー名をechoで表示 -->
-     <button type="button" class="btn btn-danger"><a href="logout.php"><font color="#ffffff">ログアウト</a></button></font>
+     <button type="button" class="btn btn-danger"><a href="Logout.php"><font color="#ffffff">ログアウト</a></button></font>
   </nav>
         <!-- ユーザーIDにHTMLタグが含まれても良いようにエスケープする -->
         <div class="container-fluid">
@@ -132,6 +132,11 @@ catch (PDOException $e) {
               $board[$count]['text']=$result['text'];
               $board[$count]['board_id']=$result['id_board'];
               $board[$count]['user_id']=$result['id_user'];
+              $sql='select count(*) from reply where id_board=:id';
+              $prepare=$pdo->prepare($sql);
+              $prepare->bindValue(':id',$board[$count]['board_id']);
+              $prepare->execute();
+              $sum[$count]=$prepare->fetchColumn();
               $count++;
             }
             $start=0;
@@ -142,29 +147,37 @@ catch (PDOException $e) {
               $start=$_POST['page']-1;
               unset($_POST['page']);
             }
-            for($count=$start*4;$count<$start+5;$count++){
+            for($count=$start*9;$count<$start+10&&$count<$count_sum;$count++){
 
               // echo "<div class=\"card card-container\">";
               echo "<table><div class=\"row\"><tr class=\"card card-container\"><div class=\"col-xl-3\"><td ><form name=\"form1\" method=\"post\" action=\"home2.php\"><input type=\"hidden\" name=\"board_id\" value={$board[$count]['board_id']}
               ><a class=\"link\" href=\"javascript:form1[$count].submit()\">rink</a></form>";
+                if($board[$count]['user_id']==$id) {
+                    echo "<form method=\"post\"> <input type=\"submit\" value=\"削除\" name=\"delete\"> <input type=\"hidden\" name=\"board_id\" value={$board[$count]['board_id']}
+              ></form>";
+                }
               echo htmlspecialchars("ユーザ名:",ENT_NOQUOTES);
               echo htmlspecialchars($board[$count]['user'],ENT_QUOTES)."　　　　　　　　".
               htmlspecialchars("タイトル: ").
               htmlspecialchars($board[$count]['title'],ENT_QUOTES)."　　　　　　　　　".
               htmlspecialchars(" 投稿日時:").
-              htmlspecialchars($board[$count]['date'],ENT_QUOTES)."</td></div><td class=\"td1\"><div class=\"col-xl-9\">".
-              htmlspecialchars($board[$count]['text'],ENT_QUOTES)."　　　　　　　　　　　　　";
+              htmlspecialchars($board[$count]['date'],ENT_QUOTES)."　　　　　　".
+                htmlspecialchars("コメント数:").
+                htmlspecialchars($sum[$count],ENT_QUOTES);
+
+
+              echo "</td></div><td class=\"td1\"><div class=\"col-xl-9\">";
+              echo nl2br(htmlspecialchars($board[$count]['text'],ENT_QUOTES))."　　　　　　　　　　　　　";
 
               if($board[$count]['user_id']==$id){
-              $html="<form method=\"post\"> <input type=\"submit\" value=\"削除\" name=\"delete\"> <input type=\"hidden\" name=\"board_id\" value={$board[$count]['board_id']}
-              ></form><br></td></tr></div></div>";
+              $html="<br></td></tr></div></div>";
               echo $html;
 
             }
               else{echo "</tr></div></div></div>";}
             }
             echo"</table>";
-            for($i=1;$i<$count_sum/5+1;$i++){
+            for($i=1;$i<$count_sum/10+1;$i++){
               $html2="<form method=\"post\" ><input type=\"submit\" class=\"btn btn-primary btn-sm\"　value=\"$i\" name=\"page\"<input type=\"hidden\" name=\"page_num\" value=$i></form>";
 
               echo $html2;
