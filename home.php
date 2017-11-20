@@ -59,7 +59,11 @@ catch (PDOException $e) {
 
                 <div class="col-xl-3">
 
-        <form method="post">
+
+            <form enctype="multipart/form-data" method="post" action="">
+                <fieldset>
+                    <legend>画像ファイルを選択(GIF, JPEG, PNGのみ対応)</legend>
+                    <input type="file" name="image" /><br />
           <div class=".card">
         title:
         <textarea name="title" rows="2" cols="35"></textarea><br></div>
@@ -67,8 +71,42 @@ catch (PDOException $e) {
         text:
         <textarea name="text" rows="8" cols="35"></textarea><br>
         <input type="submit" value="投稿" name="text_sub">
+
       </div>
-    </form></div>
+    </fieldset></form>
+                    <?php if (!empty($msgs)): ?>
+                        <fieldset>
+                            <legend>メッセージ</legend>
+                            <?php foreach ($msgs as $msg): ?>
+                                <ul>
+                                    <li style="color:<?=h($msg[0])?>;"><?=h($msg[1])?></li>
+                                </ul>
+                            <?php endforeach; ?>
+                        </fieldset>
+                    <?php endif; ?>
+                    <?php if (!empty($rows)): ?>
+                        <fieldset>
+                            <legend>サムネイル一覧(クリックすると原寸大表示)</legend>
+                            <?php foreach ($rows as $i => $row): ?>
+                                <?php if ($i): ?>
+                                    <hr />
+                                <?php endif; ?>
+                                <p>
+                                    <?=sprintf(
+                                        '<a href="?id=%d"><img src="data:%s;base64,%s" alt="%s" /></a>',
+                                        $row['id'],
+                                        image_type_to_mime_type($row['type']),
+                                        base64_encode($row['thumb_data']),
+                                        h($row['name'])
+                                    )?><br />
+                                    ファイル名: <?=h($row['name'])?><br />
+                                    日付: <?=h($row['date'])?><br clear="all" />
+                                </p>
+                            <?php endforeach; ?>
+                        </fieldset>
+                    <?php endif; ?>
+
+                </div>
         <!--<div  class="container">-->
          <div  class="col-xl-9 ">
 
@@ -93,6 +131,8 @@ catch (PDOException $e) {
           //       $errorMessage = 'パスワードが未入力です。';
             // }
         if (!empty($_POST["title"]) && !empty($_POST["text"]) ) {
+            /* アップロードがあったとき */
+
           date_default_timezone_set('Asia/Tokyo');
             $format=date("Y-m-d H:i:s");
             try{
@@ -105,9 +145,65 @@ catch (PDOException $e) {
               $prepare->bindValue(':text',$_POST['text']);
               $prepare->bindValue(':title',$_POST['title']);
               $prepare->execute();
+                $autoincrement = $pdo->lastInsertId();
             }
             catch (PDOException $e) {
                 $errorMessage = 'データベースエラー';
+            }
+//<input type="file" name="image">なので$_FILES['image']になる
+            if (is_uploaded_file($_FILES["image"]["tmp_name"])) {
+                $file_nm = $_FILES['image']['name'];
+
+                $tmp_ary = explode('.', $file_nm);
+                $extension = $tmp_ary[count($tmp_ary)-1];
+                if (move_uploaded_file($_FILES["image"]["tmp_name"], "./image/" . $autoincrement.".$extension")) {
+                    chmod("image/" . $autoincrement.".$extension", 0644);
+                    echo $_FILES["image"]["name"] . "をアップロードしました。";
+                }
+                $h = 70; // リサイズしたい大きさを指定
+                $w = 70;
+
+                $file = "./image/".$autoincrement.".".$extension; // 加工したいファイルを指定
+
+// 加工前の画像の情報を取得
+                list($original_w, $original_h, $type) = getimagesize($file);
+
+// 加工前のファイルをフォーマット別に読み出す（この他にも対応可能なフォーマット有り）
+                switch ($type) {
+                    case IMAGETYPE_JPEG:
+                        $original_image = imagecreatefromjpeg($file);
+                        break;
+                    case IMAGETYPE_PNG:
+                        $original_image = imagecreatefrompng($file);
+                        break;
+                    case IMAGETYPE_GIF:
+                        $original_image = imagecreatefromgif($file);
+                        break;
+                    default:
+                        throw new RuntimeException('対応していないファイル形式です。: ', $type);
+                }
+
+// 新しく描画するキャンバスを作成
+                $canvas = imagecreatetruecolor($w, $h);
+                imagecopyresampled($canvas, $original_image, 0,0,0,0, $w, $h, $original_w, $original_h);
+
+                $resize_path = "resize_image/".$autoincrement.".".$extension; // 保存先を指定
+
+                switch ($type) {
+                    case IMAGETYPE_JPEG:
+                        imagejpeg($canvas, $resize_path);
+                        break;
+                    case IMAGETYPE_PNG:
+                        imagepng($canvas, $resize_path, 9);
+                        break;
+                    case IMAGETYPE_GIF:
+                        imagegif($canvas, $resize_path);
+                        break;
+                }
+
+// 読み出したファイルは消去
+                imagedestroy($original_image);
+                imagedestroy($canvas);
             }
           }
         }
@@ -156,6 +252,10 @@ catch (PDOException $e) {
                     echo "<form method=\"post\"> <input type=\"submit\" value=\"削除\" name=\"delete\"> <input type=\"hidden\" name=\"board_id\" value={$board[$count]['board_id']}
               ></form>";
                 }
+                if(file_exists("resize_image/".$board[$count]['board_id'].".jpg")){
+
+                    echo "<image src= "."resize_image/".$board[$count]['board_id'].".jpg>";
+                }
               echo htmlspecialchars("ユーザ名:",ENT_NOQUOTES);
               echo htmlspecialchars($board[$count]['user'],ENT_QUOTES)."　　　　　　　　".
               htmlspecialchars("タイトル: ").
@@ -167,7 +267,13 @@ catch (PDOException $e) {
 
 
               echo "</td></div><td class=\"td1\"><div class=\"col-xl-9\">";
+
+
               echo nl2br(htmlspecialchars($board[$count]['text'],ENT_QUOTES))."　　　　　　　　　　　　　";
+
+
+
+
 
               if($board[$count]['user_id']==$id){
               $html="<br></td></tr></div></div>";
@@ -175,6 +281,7 @@ catch (PDOException $e) {
 
             }
               else{echo "</tr></div></div></div>";}
+
             }
             echo"</table>";
             for($i=1;$i<$count_sum/10+1;$i++){
@@ -206,11 +313,13 @@ if(isset($_POST['delete'])) {
   }
 }
 
+
 //ページ切り替え
 if(isset($_POST['page'])){
   $page=$_post['page_num'];
   header("Locating:home.php");
 }
         ?>
+
     </body>
 </html>
