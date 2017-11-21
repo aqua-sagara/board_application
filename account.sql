@@ -3,5 +3,6 @@ CREATE TABLE `account` (
   `password` varchar(250) DEFAULT NULL,
   `address` varchar(50) DEFAULT NULL,
   `name` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`,`address`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;

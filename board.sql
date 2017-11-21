@@ -1,13 +1,10 @@
 CREATE TABLE `board` (
-	`id_board` INT(11) NOT NULL AUTO_INCREMENT,
-	`id_user` INT(11) NOT NULL DEFAULT '0',
-	`user_name` VARCHAR(20) NULL DEFAULT '0',
-	`date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-	`text` VARCHAR(500) NULL DEFAULT '0',
-	`title` VARCHAR(50) NULL DEFAULT '',
-	PRIMARY KEY (`id_board`)
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB
-AUTO_INCREMENT=22
-;
+  `id_board` int(11) NOT NULL AUTO_INCREMENT,
+  `id_user` int(11) NOT NULL DEFAULT '0',
+  `user_name` varchar(20) DEFAULT '0',
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `text` varchar(500) DEFAULT '0',
+  `title` varchar(50) DEFAULT '',
+  PRIMARY KEY (`id_board`),
+  KEY `id_board` (`id_board`)
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8;
