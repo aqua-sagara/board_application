@@ -3,7 +3,7 @@ session_start();
 include_once 'dbconnect.php';
 // ログイン状態チェック
 if (!isset($_SESSION["user"])) {
-    header("Location: Logout.php");
+    header("Location: logout.php");
     exit;
 }
 $errorMessage="";
@@ -49,7 +49,7 @@ catch (PDOException $e) {
     ようこそ<u><?php echo htmlspecialchars($_SESSION["user"], ENT_QUOTES);
     ?></u>さん
      <!-- ユーザー名をechoで表示 -->
-     <button type="button" class="btn btn-danger"><a href="Logout.php"><font color="#ffffff">ログアウト</a></button></font>
+     <button type="button" class="btn btn-danger"><a href="logout.php"><font color="#ffffff">ログアウト</a></button></font>
   </nav>
         <!-- ユーザーIDにHTMLタグが含まれても良いようにエスケープする -->
         <div class="container-fluid">
@@ -243,7 +243,7 @@ catch (PDOException $e) {
               $start=$_POST['page']-1;
               unset($_POST['page']);
             }
-            for($count=$start*9;$count<$start+10&&$count<$count_sum;$count++){
+            for($count=$start*9;$count<$start*9+10&&$count<$count_sum;$count++){
 
               // echo "<div class=\"card card-container\">";
               echo "<table><div class=\"row\"><tr class=\"card card-container\"><div class=\"col-xl-3\"><td ><form name=\"form1\" method=\"post\" action=\"home2.php\"><input type=\"hidden\" name=\"board_id\" value={$board[$count]['board_id']}
@@ -255,6 +255,14 @@ catch (PDOException $e) {
                 if(file_exists("resize_image/".$board[$count]['board_id'].".jpg")){
 
                     echo "<image src= "."resize_image/".$board[$count]['board_id'].".jpg>";
+                }
+                else if (file_exists("resize_image/".$board[$count]['board_id'].".gif")){
+
+                    echo "<image src= "."resize_image/".$board[$count]['board_id'].".gif>";
+                }
+                else if(file_exists("resize_image/".$board[$count]['board_id'].".png")){
+
+                    echo "<image src= "."resize_image/".$board[$count]['board_id'].".png>";
                 }
               echo htmlspecialchars("ユーザ名:",ENT_NOQUOTES);
               echo htmlspecialchars($board[$count]['user'],ENT_QUOTES)."　　　　　　　　".

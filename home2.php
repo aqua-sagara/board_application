@@ -97,6 +97,11 @@ catch (PDOException $e) {
           <div class="row">
               <div class="col-xl-10 col-xl-offset-2">
               <div class="card card-container">
+                 <?php if(file_exists("resize_image/".$_SESSION['board_id'].".jpg")){
+
+                  echo "<image src= "."resize_image/".$_SESSION['board_id'].".jpg>";
+                  }
+                  ?>
                 <font class="title"><?php echo htmlspecialchars($title,ENT_QUOTES)?></font>
                 <font class="data"><?php echo htmlspecialchars("name:".$user_name."日付:".$date,ENT_QUOTES)?></font><p>
                 <font class="text"><?php echo htmlspecialchars($text,ENT_QUOTES)?></font>
@@ -130,6 +135,9 @@ catch (PDOException $e) {
           echo "<p>";
           echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
         }
+        else {
+              echo "返信がありません";
+        }
           $i++;
            ?>
           </div></div></div>
@@ -141,18 +149,9 @@ catch (PDOException $e) {
           echo "<p>";
           echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
         }
-          $i++;
-
-           ?>
-          </div></div></div>
-          <div class="row">
-          <div class="col-xl-10 col-xl-offset-2">
-          <div id="toukou2"class="card card-container"><?php
-          if($i<$sum){
-          echo htmlspecialchars("name:".$reply[$i]['user_name']."date:".$reply[$i]['date'],ENT_QUOTES);
-          echo "<p>";
-          echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
-        }
+          else {
+              echo "返信がありません";
+          }
           $i++;
 
            ?>
@@ -165,6 +164,9 @@ catch (PDOException $e) {
           echo "<p>";
           echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
         }
+          else {
+              echo "返信がありません";
+          }
           $i++;
 
            ?>
@@ -177,6 +179,24 @@ catch (PDOException $e) {
           echo "<p>";
           echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
         }
+          else {
+              echo "返信がありません";
+          }
+          $i++;
+
+           ?>
+          </div></div></div>
+          <div class="row">
+          <div class="col-xl-10 col-xl-offset-2">
+          <div id="toukou2"class="card card-container"><?php
+          if($i<$sum){
+          echo htmlspecialchars("name:".$reply[$i]['user_name']."date:".$reply[$i]['date'],ENT_QUOTES);
+          echo "<p>";
+          echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
+        }
+          else {
+              echo "返信がありません";
+          }
           $i++;
 
            ?>
