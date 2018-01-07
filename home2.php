@@ -1,4 +1,5 @@
 <?php
+session_cache_limiter('private_no_expire');
 session_start();
 include_once 'dbconnect.php';
 // ログイン状態チェック
@@ -59,14 +60,27 @@ catch (PDOException $e) {
             <li class="nav-item active">
               <a class="nav-link" href="home.php">ホーム <span class="sr-only">(現位置)</span></a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item ">
+                <?php
+
+                if(isset($_SESSION['page_num'])) {
+                    $page = $_SESSION['page_num'];
+//                    echo "<form method=\"post\" ><a class=\"nav-link\" href=\"home.php\">戻る</a>
+//                    <input type=\"hidden\" name=\"session_page\" value=$page></form>";
+                    echo "<form method=\"post\" name=\"form1\" action=\"home.php\">
+                    <input type=\"hidden\" name=\"session_page\" value=\"$page\">
+                    <a href=\"javascript:form1.submit()\">戻る</a>
+                    </form>";
+                }
+                else echo "<a class=\"nav-link\" href=\"home.php\">戻る</a>";
+                ?>
+            </li>
+                <li class="nav-item">
               <a class="nav-link" href="logout.php">ログアウト</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="#">リンク2</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">無効</a>
+             <a class="nav-link disabled" href="#">無効</a>
             </li>
           </ul>
         </div>
@@ -126,81 +140,21 @@ catch (PDOException $e) {
         </div>
           </div>
 
-          <div class="row">
-          <div class="col-xl-10 col-xl-offset-2">
-          <div id="toukou2"class="card card-container"><?php
+          <?php
+
           $i=0;
-          if($i<$sum){
-          echo htmlspecialchars("name:".$reply[$i]['user_name']."date:".$reply[$i]['date'],ENT_QUOTES);
+          while($i<$sum){
+              echo "<div class=\"row\"><div class=\"col-xl-10 col-xl-offset-2\"><div id=\"toukou2\"class=\"card card-container\">";
+          echo htmlspecialchars("name:" . $reply[$i]['user_name'] . "date:" . $reply[$i]['date'], ENT_QUOTES);
           echo "<p>";
-          echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
-        }
-        else {
-              echo "返信がありません";
-        }
-          $i++;
-           ?>
-          </div></div></div>
-          <div class="row">
-          <div class="col-xl-10 col-xl-offset-2">
-          <div id="toukou2"class="card card-container"><?php
-          if($i<$sum){
-          echo htmlspecialchars("name:".$reply[$i]['user_name']."date:".$reply[$i]['date'],ENT_QUOTES);
-          echo "<p>";
-          echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
-        }
-          else {
-              echo "返信がありません";
-          }
-          $i++;
+          echo htmlspecialchars($reply[$i]['text'], ENT_QUOTES);
+          echo "</div></div></div>";
 
-           ?>
-          </div></div></div>
-          <div class="row">
-          <div class="col-xl-10 col-xl-offset-2">
-          <div id="toukou2"class="card card-container"><?php
-          if($i<$sum){
-          echo htmlspecialchars("name:".$reply[$i]['user_name']."date:".$reply[$i]['date'],ENT_QUOTES);
-          echo "<p>";
-          echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
-        }
-          else {
-              echo "返信がありません";
-          }
           $i++;
-
-           ?>
-          </div></div></div>
-          <div class="row">
-          <div class="col-xl-10 col-xl-offset-2">
-          <div id="toukou2"class="card card-container"><?php
-          if($i<$sum){
-          echo htmlspecialchars("name:".$reply[$i]['user_name']."date:".$reply[$i]['date'],ENT_QUOTES);
-          echo "<p>";
-          echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
-        }
-          else {
-              echo "返信がありません";
           }
-          $i++;
-
            ?>
-          </div></div></div>
-          <div class="row">
-          <div class="col-xl-10 col-xl-offset-2">
-          <div id="toukou2"class="card card-container"><?php
-          if($i<$sum){
-          echo htmlspecialchars("name:".$reply[$i]['user_name']."date:".$reply[$i]['date'],ENT_QUOTES);
-          echo "<p>";
-          echo htmlspecialchars($reply[$i]['text'],ENT_QUOTES);
-        }
-          else {
-              echo "返信がありません";
-          }
-          $i++;
 
-           ?>
-          </div></div></div>
+
         </div>
 
 

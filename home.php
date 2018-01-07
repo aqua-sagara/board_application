@@ -46,8 +46,9 @@ catch (PDOException $e) {
       <nav class="navbar navbar-inverse bg-primary">
     <!-- Navbar content -->
     <h1><font  class="btn btn-danger">メイン画面</font></h1>
-    ようこそ<u><?php echo htmlspecialchars($_SESSION["user"], ENT_QUOTES);
-    ?></u>さん
+    <u><font class="btn btn-danger">
+    ようこそ<?php echo htmlspecialchars($_SESSION["user"], ENT_QUOTES);
+    ?>さん</u></font>
      <!-- ユーザー名をechoで表示 -->
      <button type="button" class="btn btn-danger"><a href="logout.php"><font color="#ffffff">ログアウト</a></button></font>
   </nav>
@@ -71,6 +72,20 @@ catch (PDOException $e) {
         text:
         <textarea name="text" rows="8" cols="35"></textarea><br>
         <input type="submit" value="投稿" name="text_sub">
+        <li>
+            現在のページ番号<?php
+            if(isset($_POST['session_page'])){
+            echo $_POST['session_page']+1;
+            }
+            else if(isset($_POST['page'])){
+                echo $_POST['page'];
+            }
+            else {
+                echo "1ページ";
+
+            }
+            ?>
+        </li>
 
       </div>
     </fieldset></form>
@@ -236,18 +251,29 @@ catch (PDOException $e) {
               $count++;
             }
             $start=0;
+            $_SESSION['page_num']=0;
             if(isset($_POST['page_num'])){
               $start=$_POST['page_num']-1;
+
             }
             if(isset($_POST['page'])){
               $start=$_POST['page']-1;
+                $_SESSION['page_num']=$start;
+                $start=$_SESSION['page_num'];
               unset($_POST['page']);
             }
+            if(isset($_POST['session_page'])){
+
+                $start=$_POST['session_page'];
+                unset($_POST['session_page']);
+            }
+            $count2=0;
             for($count=$start*9;$count<$start*9+10&&$count<$count_sum;$count++){
 
               // echo "<div class=\"card card-container\">";
-              echo "<table><div class=\"row\"><tr class=\"card card-container\"><div class=\"col-xl-3\"><td ><form name=\"form1\" method=\"post\" action=\"home2.php\"><input type=\"hidden\" name=\"board_id\" value={$board[$count]['board_id']}
-              ><a class=\"link\" href=\"javascript:form1[$count].submit()\">rink</a></form>";
+              echo "<table><div class=\"row\"><tr class=\"card card-container\"><div class=\"col-xl-3\"><td ><span data-badge-top-left=\"$sum[$count]\"><form name=\"form1\" method=\"post\" action=\"home2.php\"><input type=\"hidden\"
+                name=\"board_id\" value={$board[$count]['board_id']}
+              ><a class=\"link\" href=\"javascript:form1[$count2].submit()\">rink</a></form></span>";
                 if($board[$count]['user_id']==$id) {
                     echo "<form method=\"post\"> <input type=\"submit\" value=\"削除\" name=\"delete\"> <input type=\"hidden\" name=\"board_id\" value={$board[$count]['board_id']}
               ></form>";
@@ -289,14 +315,17 @@ catch (PDOException $e) {
 
             }
               else{echo "</tr></div></div></div>";}
-
+                $count2++;
             }
             echo"</table>";
+            echo "<div style=\"display:inline-flex\">";
             for($i=1;$i<$count_sum/10+1;$i++){
+
               $html2="<form method=\"post\" ><input type=\"submit\" class=\"btn btn-primary btn-sm\"　value=\"$i\" name=\"page\"<input type=\"hidden\" name=\"page_num\" value=$i></form>";
 
               echo $html2;
             }
+            echo "</div>";
             echo "</div></div></div></div>";
             $max_page=$i;
 
@@ -315,6 +344,7 @@ if(isset($_POST['delete'])) {
     $prepare3->execute();
     unset($_POST['delete']);
     header("Location: home.php");
+    exit();
   }
   catch (PDOException $e) {
       $errorMessage = 'データベースエラー';
@@ -326,6 +356,7 @@ if(isset($_POST['delete'])) {
 if(isset($_POST['page'])){
   $page=$_post['page_num'];
   header("Locating:home.php");
+  exit();
 }
         ?>
 
