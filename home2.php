@@ -145,7 +145,7 @@ catch (PDOException $e) {
           $i=0;
           while($i<$sum){
               echo "<div class=\"row\"><div class=\"col-xl-10 col-xl-offset-2\"><div id=\"toukou2\"class=\"card card-container\">";
-          echo htmlspecialchars("name:" . $reply[$i]['user_name'] . "date:" . $reply[$i]['date'], ENT_QUOTES);
+          echo htmlspecialchars( $reply[$i]['user_name'] . "　　". $reply[$i]['date'], ENT_QUOTES);
           echo "<p>";
           echo htmlspecialchars($reply[$i]['text'], ENT_QUOTES);
           echo "</div></div></div>";
@@ -175,7 +175,7 @@ if(isset($_POST['toukou_submit'])){
           $prepare=$pdo->prepare($sql);
           $prepare->bindValue(':board',$_SESSION['board_id'],PDO::PARAM_INT);
           $prepare->bindValue(':user_id',$user_id,PDO::PARAM_INT);
-          $prepare->bindValue(':name',$user_name,PDO::PARAM_STR);
+          $prepare->bindValue(':name',$_SESSION['user'],PDO::PARAM_STR);
           $prepare->bindValue(':date',$format);
           $prepare->bindValue(':text',$_POST['text']);
           $prepare->bindValue(':title',$title);
